@@ -24,14 +24,13 @@ SCOPES = [
 
 mcp = FastMCP("Google Services")
 
-def get_credentials():
+def get_credentials(account: str = "primary"):
     """Gets valid user credentials from storage or runs the flow."""
     creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    token_file = f"token_{account}.json"
+    
+    if os.path.exists(token_file):
+        creds = Credentials.from_authorized_user_file(token_file, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -44,14 +43,22 @@ def get_credentials():
             flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open("token.json", "w") as token:
+        with open(token_file, "w") as token:
             token.write(creds.to_json())
     return creds
 
 @mcp.tool()
-async def list_emails(max_results: int = 10) -> List[dict]:
+async def list_google_accounts() -> List[str]:
+    """List all configured Google accounts by looking for token_{account}.json files."""
+    import glob
+    token_files = glob.glob("token_*.json")
+    accounts = [f.replace("token_", "").replace(".json", "") for f in token_files]
+    return accounts if accounts else ["No accounts configured. Use any tool with an account name to authenticate."]
+
+@mcp.tool()
+async def list_emails(account: str = "primary", max_results: int = 10) -> List[dict]:
     """List recent emails from the user's inbox."""
-    creds = get_credentials()
+    creds = get_credentials(account)
     try:
         service = build("gmail", "v1", credentials=creds)
         results = service.users().messages().list(userId="me", maxResults=max_results).execute()
@@ -76,9 +83,9 @@ async def list_emails(max_results: int = 10) -> List[dict]:
         return [{"error": str(error)}]
 
 @mcp.tool()
-async def read_email(message_id: str) -> dict:
+async def read_email(account: str = "primary", message_id: str = "") -> dict:
     """Read the full content of a specific email by ID."""
-    creds = get_credentials()
+    creds = get_credentials(account)
     try:
         service = build("gmail", "v1", credentials=creds)
         message = service.users().messages().get(userId="me", id=message_id).execute()
@@ -93,7 +100,8 @@ async def read_email(message_id: str) -> dict:
         if "parts" in payload:
             for part in payload["parts"]:
                 if part["mimeType"] == "text/plain":
-                    body = base64.urlsafe_b64decode(part["body"]["data"]).decode()
+                    if "data" in part["body"]:
+                        body = base64.urlsafe_b64decode(part["body"]["data"]).decode()
         elif "body" in payload and payload["body"].get("data"):
             body = base64.urlsafe_b64decode(payload["body"]["data"]).decode()
             
@@ -108,9 +116,9 @@ async def read_email(message_id: str) -> dict:
         return {"error": str(error)}
 
 @mcp.tool()
-async def create_draft(to: str, subject: str, body: str) -> dict:
+async def create_draft(to: str, subject: str, body: str, account: str = "primary") -> dict:
     """Create a new email draft."""
-    creds = get_credentials()
+    creds = get_credentials(account)
     try:
         service = build("gmail", "v1", credentials=creds)
         message = EmailMessage()
@@ -127,9 +135,9 @@ async def create_draft(to: str, subject: str, body: str) -> dict:
         return {"error": str(error)}
 
 @mcp.tool()
-async def list_calendar_events(max_results: int = 10) -> List[dict]:
+async def list_calendar_events(account: str = "primary", max_results: int = 10) -> List[dict]:
     """List upcoming events from the primary calendar."""
-    creds = get_credentials()
+    creds = get_credentials(account)
     try:
         service = build("calendar", "v3", credentials=creds)
         from datetime import datetime
@@ -152,9 +160,9 @@ async def list_calendar_events(max_results: int = 10) -> List[dict]:
         return [{"error": str(error)}]
 
 @mcp.tool()
-async def add_calendar_event(summary: str, start_time: str, end_time: str, description: Optional[str] = None) -> dict:
+async def add_calendar_event(summary: str, start_time: str, end_time: str, account: str = "primary", description: Optional[str] = None) -> dict:
     """Add a new event to the primary calendar. start_time and end_time should be in ISO format (e.g., 2024-05-12T10:00:00Z)."""
-    creds = get_credentials()
+    creds = get_credentials(account)
     try:
         service = build("calendar", "v3", credentials=creds)
         event = {
