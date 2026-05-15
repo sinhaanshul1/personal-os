@@ -60,6 +60,7 @@ jsonschema-path==0.4.6
 jsonschema-specifications==2025.9.1
 keyring==25.7.0
 kubernetes==35.0.0
+langchain-chroma==1.1.0
 langchain-core==1.4.0
 langchain-google-genai==4.2.2
 langchain-protocol==0.0.15
