@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 # Initialize the LLM
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
 
 async def communications_node(state: AgentState) -> dict:
     """Handles communications: identifies urgent emails and drafts professional replies."""

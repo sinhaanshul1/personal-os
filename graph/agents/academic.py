@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 # Initialize the LLM
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
 
 async def academic_node(state: AgentState) -> dict:
     """Manages academic tasks: deadlines, study schedules, quizzes, and research."""

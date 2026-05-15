@@ -11,7 +11,7 @@ async def triage_node(state: AgentState) -> dict:
     # Fetch emails from primary account
     emails = await list_emails(account="primary", max_results=5)
     
-    # Fetch school emails if they exist (based on token_school.json seen in ls)
+    # Fetch school emails if they exist
     school_emails = []
     try:
         school_emails = await list_emails(account="school", max_results=5)
