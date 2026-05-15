@@ -26,6 +26,7 @@ async def communications_node(state: AgentState) -> dict:
     2. For the most important emails, use the `create_draft` tool to actually create a draft in the user's Gmail.
     3. If you decide to create a draft, inform the user in your text response which emails you've handled.
     4. For other emails, provide a 1-sentence summary of why they don't need an immediate reply.
+    5. Do NOT use any emojis in your response.
     """
     
     response = await llm_with_tools.ainvoke(prompt)

@@ -32,7 +32,7 @@ async def academic_node(state: AgentState) -> dict:
     4. Three mock quiz questions related to the most pressing assignment or course.
     5. Initial research or helpful links/concepts for the next major assignment.
     
-    Be concise but encouraging.
+    Be concise but encouraging. Do NOT use any emojis in your response.
     """
     
     response = await llm_with_tools.ainvoke(prompt)

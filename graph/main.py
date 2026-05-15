@@ -75,17 +75,17 @@ async def run_personal_assistant():
         "daily_report": ""
     }
     
-    print("🚀 Initializing Personal Assistant Graph...")
+    print("Initializing Personal Assistant Graph...")
     final_state = await app.ainvoke(initial_state)
     
-    print("\n" + "═"*50)
-    print("📋 FINAL DAILY REPORT")
-    print("═"*50)
+    print("\n" + "="*50)
+    print("FINAL DAILY REPORT")
+    print("="*50)
     print(final_state.get("daily_report", "No report generated."))
-    print("═"*50)
+    print("="*50)
 
 if __name__ == "__main__":
     try:
         asyncio.run(run_personal_assistant())
     except Exception as e:
-        print(f"❌ Error running graph: {e}")
+        print(f"Error running graph: {e}")

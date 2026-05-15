@@ -25,6 +25,7 @@ async def synthesis_node(state: AgentState) -> dict:
     Task:
     Create a "Daily Report" that is professional, clear, and actionable. 
     Use headers for different sections (e.g., Academic Overview, Communications, Next Steps).
+    Do NOT use any emojis in your response.
     End with a motivational sign-off.
     """
     
